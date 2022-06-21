@@ -36,13 +36,16 @@ public class WebSecurityConfig {
     @Resource
     private PasswordEncoder passwordEncoder;
 
+    @Resource
+    private CustomAuthorizationManager customAuthorizationManager;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .authorizeRequests(authorize -> authorize
+                .authorizeHttpRequests(authorize -> authorize
                         .antMatchers("/login").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().access(customAuthorizationManager)
                 )
                 .formLogin().disable()
                 .addFilterAt(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
