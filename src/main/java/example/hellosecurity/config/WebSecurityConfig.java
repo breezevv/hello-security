@@ -12,7 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.access.ExceptionTranslationFilter;
 
 import javax.annotation.Resource;
 
@@ -48,8 +48,15 @@ public class WebSecurityConfig {
                         .anyRequest().access(customAuthorizationManager)
                 )
                 .formLogin().disable()
-                .addFilterAt(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .addFilterAfter(jwtAuthenticationFilter, ExceptionTranslationFilter.class)
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
+                    response.setContentType("text/plain;charset=UTF-8");
+                    response.getWriter().write(authException.getMessage());
+                }).accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.setContentType("text/plain;charset=UTF-8");
+                    response.getWriter().write(accessDeniedException.getMessage());
+                });
         return http.build();
     }
 

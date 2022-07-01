@@ -7,6 +7,7 @@ import example.hellosecurity.domain.UserRole;
 import example.hellosecurity.repository.AuthorityRepository;
 import example.hellosecurity.repository.RoleAuthorityRepository;
 import example.hellosecurity.repository.UserRoleRepository;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.core.Authentication;
@@ -55,6 +56,6 @@ public class CustomAuthorizationManager implements AuthorizationManager<RequestA
         if (hasPermission) {
             return new AuthorizationDecision(hasPermission);
         }
-        throw new RuntimeException("没有权限访问！");
+        throw new AccessDeniedException("没有权限访问！");
     }
 }
