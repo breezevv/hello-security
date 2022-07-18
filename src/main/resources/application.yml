@@ -1,9 +1,15 @@
 spring:
   redis:
-    host: 192.168.0.106
+    host: 192.168.1.4
     port: 6379
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.0.106:3306/security?useSSL=false&useUnicode=true&characterEncoding=utf-8&autoReconnect=true&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://192.168.1.4:3306/security?useSSL=false&useUnicode=true&characterEncoding=utf-8&autoReconnect=true&serverTimezone=Asia/Shanghai
     username: root
     password: 123456
+
+ignore:
+  post:
+    - "/login"
+  get:
+    - "/ignore"

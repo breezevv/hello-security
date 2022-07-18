@@ -13,6 +13,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import javax.annotation.Resource;
 
@@ -39,12 +40,15 @@ public class WebSecurityConfig {
     @Resource
     private CustomAuthorizationManager customAuthorizationManager;
 
+    @Resource
+    private RequestMatcher[] requestMatchers;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
                 .authorizeHttpRequests(authorize -> authorize
-                        .antMatchers("/login").permitAll()
+                        .requestMatchers(requestMatchers).permitAll()
                         .anyRequest().access(customAuthorizationManager)
                 )
                 .formLogin().disable()

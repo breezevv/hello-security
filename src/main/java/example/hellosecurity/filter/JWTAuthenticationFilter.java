@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -29,9 +30,12 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
+    @Resource
+    private RequestMatcher[] notAuthenticationMatchers;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if ("/login".equals(request.getRequestURI())) {
+        if (!requireAuthentication(request)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -55,5 +59,17 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         }
         SecurityContextHolder.getContext().setAuthentication(UsernamePasswordAuthenticationToken.authenticated(userDetails, null, null));
         filterChain.doFilter(request, response);
+    }
+
+    public boolean requireAuthentication(HttpServletRequest request) {
+        if (notAuthenticationMatchers == null || notAuthenticationMatchers.length == 0) {
+            return true;
+        }
+        for (RequestMatcher requestMatcher : notAuthenticationMatchers) {
+            if (requestMatcher.matches(request)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
